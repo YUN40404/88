@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>零柒Zero | 摄影企划</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;900&family=Noto+Sans+SC:wght@300;400;700;900&display=swap');
+        :root { --bg-color: #161a21; --card-bg: rgba(30, 34, 43, 0.4); --card-border: rgba(255, 255, 255, 0.04); --color-teal: #6fa8a5; --color-pink: #e2bac8; --color-khaki: #c4c698; --color-text-main: #eef0f4; --color-text-muted: #8b92a5; }
+        body { background: radial-gradient(circle at 50% 50%, rgba(45, 52, 64, 0.5) 0%, rgba(22, 26, 33, 1) 100%), var(--bg-color); color: var(--color-text-main); font-family: 'Montserrat', 'Noto Sans SC', sans-serif; min-height: 100vh; scroll-behavior: smooth; position: relative; overflow-x: hidden; }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeContrast amount='1.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E"); pointer-events: none; z-index: 1; mix-blend-mode: overlay; }
+        .relative-content { position: relative; z-index: 10; }
+        .font-display { font-family: 'Montserrat', 'Noto Sans SC', sans-serif; font-weight: 900; letter-spacing: -0.02em; }
+        .constraint-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 2.5rem; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; }
+        .constraint-card:hover { background: rgba(50, 54, 65, 0.6); transform: translateY(-4px); border-color: rgba(255, 255, 255, 0.1); }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-on-load { animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .delay-100 { animation-delay: 100ms; } .delay-200 { animation-delay: 200ms; } .delay-300 { animation-delay: 300ms; } .delay-400 { animation-delay: 400ms; } .delay-500 { animation-delay: 500ms; }
+        @keyframes slowPulse { 0%, 100% { transform: scale(1); opacity: 0.1; } 50% { transform: scale(1.1); opacity: 0.2; } }
+        .bg-shape { animation: slowPulse 10s infinite ease-in-out; }
+        .nav-container { position: relative; display: flex; align-items: center; padding: 0.25rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 999px; backdrop-filter: blur(10px); }
+        .nav-indicator { position: absolute; height: calc(100% - 0.5rem); top: 0.25rem; background-color: #ffffff; border-radius: 999px; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; opacity: 0; z-index: 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        .nav-item { position: relative; z-index: 10; padding: 0.5rem 1.5rem; transition: color 0.3s ease; }
+        .nav-item:hover { color: #000000 !important; }
+        .pill-btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem 2rem; border-radius: 999px; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em; transition: all 0.3s ease; text-transform: uppercase; }
+        .pill-btn-primary { background-color: var(--color-teal); color: #1e222b; }
+        .pill-btn-primary:hover { background-color: #85c4c1; transform: scale(0.98); }
+        .pill-btn-outline { border: 1px solid var(--color-text-muted); color: var(--color-text-main); }
+        .pill-btn-outline:hover { background-color: rgba(255, 255, 255, 0.05); border-color: var(--color-text-main); }
+    </style>
+</head>
+<body class="antialiased selection:bg-[#6fa8a5] selection:text-white break-words">
+    <div class="relative-content">
+        <nav class="fixed w-full z-50 py-6">
+            <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+                <a href="index.html" class="text-xl font-display tracking-[0.3em] text-white">ZERO</a>
+                <div class="hidden md:flex items-center gap-4">
+                    <div class="nav-container" id="nav-group">
+                        <div class="nav-indicator" id="nav-indicator"></div>
+                        <a href="#services" class="nav-item text-[10px] font-bold tracking-[0.2em] text-[#8b92a5] uppercase">服务列表</a>
+                        <a href="#portfolio" class="nav-item text-[10px] font-bold tracking-[0.2em] text-[#8b92a5] uppercase">作品图库</a>
+                        <a href="#workflow" class="nav-item text-[10px] font-bold tracking-[0.2em] text-[#8b92a5] uppercase">流程须知</a>
+                        <a href="portal.html" class="nav-item text-[10px] font-bold tracking-[0.2em] text-[#e2bac8] uppercase">自助预约</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <a href="portal.html" class="text-[10px] font-bold tracking-widest text-[#e2bac8] border border-[#e2bac8]/30 px-3 py-1.5 rounded-full uppercase">自助预约</a>
+                </div>
+            </div>
+        </nav>
+
+        <header class="min-h-screen flex items-center relative px-6 max-w-7xl mx-auto pt-20 pb-10">
+            <div class="absolute right-[5%] top-[10%] w-[400px] h-[500px] rounded-[6rem] bg-[#6fa8a5] opacity-10 blur-3xl -z-10 bg-shape"></div>
+            <div class="w-full md:w-3/4 lg:w-2/3 flex flex-col items-start relative z-10">
+                <div class="animate-on-load inline-block px-4 py-1.5 rounded-full border border-white/10 text-[10px] text-[#c4c698] mb-8 tracking-[0.2em] font-bold uppercase bg-white/5 backdrop-blur-sm">Status: Available</div>
+                <h1 class="animate-on-load delay-100 font-display text-5xl md:text-7xl lg:text-8xl mb-8 leading-[1.05] text-white">
+                    定格破次元的<br/>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-[#8b92a5] font-light tracking-[0.15em] text-3xl md:text-5xl lg:text-6xl block mt-4 uppercase">LIGHT & SHADOW.</span>
+                </h1>
+                <p class="animate-on-load delay-200 text-sm md:text-base text-[#8b92a5] max-w-xl mb-12 leading-relaxed tracking-wide">专注二次元漫展场照、专属棚拍与绝美外景。用镜头的温度记录共鸣时刻。</p>
+                <div class="animate-on-load delay-300 flex flex-wrap gap-4">
+                    <a href="#services" class="pill-btn pill-btn-primary">服务列表</a>
+                    <a href="portfolio.html" class="pill-btn pill-btn-outline">作品图库</a>
+                </div>
+            </div>
+        </header>
+
+        <section class="max-w-4xl mx-auto px-6 relative z-20 -mt-10 mb-24 animate-on-load delay-300">
+            <div class="constraint-card py-4 px-8 flex flex-col md:flex-row items-center justify-between shadow-2xl bg-[#282c35]/80">
+                <div class="flex items-start space-x-4">
+                    <div class="w-2 h-2 rounded-full bg-[#c4c698] animate-ping mt-1.5"></div>
+                    <p id="notice-text" class="text-xs text-[#8b92a5] font-semibold whitespace-pre-wrap leading-relaxed">正在同步后台数据...</p>
+                </div>
+                <a href="#contact" class="text-[10px] font-black tracking-widest text-[#c4c698] uppercase shrink-0 mt-4 md:mt-0 ml-4">联系我 →</a>
+            </div>
+        </section>
+
+        <section id="services" class="py-20 px-6 max-w-7xl mx-auto">
+            <div class="mb-16 animate-on-load text-center md:text-left">
+                <h2 class="font-display text-4xl text-white mb-2 uppercase tracking-tighter">摄影服务 · 专属企划</h2>
+                <p class="text-[#8b92a5] text-[10px] font-bold tracking-[0.3em] uppercase">透明报价，按需选择，用心对待每一次快门</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="constraint-card md:col-span-2 p-10 flex flex-col justify-between relative group animate-on-load delay-100">
+                    <div class="absolute inset-0 bg-gradient-to-br from-[#1e222b] to-transparent opacity-50 z-0"></div>
+                    <div class="relative z-10 flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-8">
+                            <div class="text-[10px] font-black tracking-widest border border-[#e2bac8] bg-[#e2bac8]/10 px-4 py-1 rounded-full text-[#e2bac8]">热门</div>
+                            <div class="text-right">
+                                <div class="text-4xl font-display text-white mt-1"><span class="text-xs font-normal text-[#8b92a5] mr-2">沪广杭地区</span>¥<span id="price-hgh">--</span> <span class="text-xs font-normal text-[#8b92a5]">/4张</span></div>
+                                <div class="text-4xl font-display text-white"><span class="text-xs font-normal text-[#8b92a5] mr-2">石家庄地区</span>¥<span id="price-cz">--</span> <span class="text-xs font-normal text-[#8b92a5]">/4张</span></div>
+                      </div>
+                        </div>
+                        <h3 class="text-3xl font-display text-white mb-6 uppercase tracking-wider">漫展场照拍摄 <span class="text-sm font-normal text-[#8b92a5] ml-2 tracking-widest">Exhibition</span></h3>
+                        <ul class="space-y-3 text-[#8b92a5] text-xs font-medium tracking-wide mb-10 flex-grow">
+                            <li class="flex items-center"><span class="mr-3 text-[#e2bac8] text-sm">✦</span> 漫展现场跟拍捕捉神态</li>
+                            <li class="flex items-center"><span class="mr-3 text-[#e2bac8] text-sm">✦</span> 包含基础调色与面部精修</li>
+                            <li class="flex items-center"><span class="mr-3 text-[#e2bac8] text-sm">✦</span> 出片率高，极速返图</li>
+                        </ul>
+                        <a href="portal.html" class="inline-block self-start text-[10px] font-black tracking-widest text-[#1e222b] bg-[#e2bac8] hover:bg-white transition-colors py-3 px-8 rounded-full uppercase">立即自助预约</a>
+                    </div>
+                </div>
+
+                <div class="constraint-card p-10 flex flex-col justify-between bg-[#2d262a] hover:bg-[#382d32] animate-on-load delay-200">
+                    <div class="flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-8">
+                            <div class="text-[10px] text-[#e2bac8] uppercase font-bold tracking-[0.2em]">Post-Process</div>
+                            <div class="text-3xl font-display text-white">¥248 <span class="text-xs font-normal text-[#8b92a5]">/张</span></div>
+                        </div>
+                        <h3 class="text-2xl font-display text-[#e2bac8] mb-6 uppercase tracking-wider">场照特效合成 <span class="block text-sm font-normal text-[#8b92a5] mt-2 tracking-widest">Visual FX</span></h3>
+                        <ul class="space-y-3 text-[#8b92a5] text-xs font-medium tracking-wide mb-10 flex-grow">
+                            <li class="flex items-start"><span class="mr-3 text-[#e2bac8] text-sm leading-none mt-0.5">✦</span> 深度抠图与二次元场景融合</li>
+                            <li class="flex items-start"><span class="mr-3 text-[#e2bac8] text-sm leading-none mt-0.5">✦</span> 专属特效、光影与氛围重塑</li>
+                            <li class="flex items-start"><span class="mr-3 text-[#e2bac8] text-sm leading-none mt-0.5">✦</span> 打破次元壁</li>
+                        </ul>
+                        <a href="portal.html" class="inline-block text-center text-[10px] font-black tracking-widest text-white border border-white/20 hover:bg-white/10 transition-colors py-3 px-6 rounded-full uppercase">立即自助预约</a>
+                    </div>
+                </div>
+
+                <div class="constraint-card p-10 flex flex-col justify-between bg-[#222a2c] hover:bg-[#283234] animate-on-load delay-300">
+                    <div class="flex flex-col h-full">
+                         <div class="flex justify-between items-start mb-8">
+                            <div class="text-[10px] text-[#6fa8a5] uppercase font-bold tracking-[0.2em]">Outdoor</div>
+                            <div class="text-3xl font-display text-white">¥299 <span class="text-xs font-normal text-[#8b92a5]">/套</span></div>
+                        </div>
+                        <h3 class="text-2xl font-display text-[#6fa8a5] mb-6 uppercase tracking-wider">绝美外景拍摄<span class="block text-sm font-normal text-[#8b92a5] mt-2 tracking-widest">Location </span></h3>
+                        <ul class="space-y-3 text-[#8b92a5] text-xs font-medium tracking-wide mb-10 flex-grow">
+                            <li class="flex items-start"><span class="mr-3 text-[#6fa8a5] text-sm leading-none mt-0.5">✦</span> 自然光影捕捉与环境氛围融合</li>
+                            <li class="flex items-start"><span class="mr-3 text-[#6fa8a5] text-sm leading-none mt-0.5">✦</span> 深度构图设计，前期动作指导</li>
+                            <li class="flex items-start"><span class="mr-3 text-[#6fa8a5] text-sm leading-none mt-0.5">✦</span> 包含多张高规格氛围感成片</li>
+                        </ul>
+                        <a href="portal.html" class="inline-block text-center text-[10px] font-black tracking-widest text-white border border-white/20 hover:bg-white/10 transition-colors py-3 px-6 rounded-full uppercase">立即自助预约</a>
+                    </div>
+                </div>
+
+                <div class="constraint-card md:col-span-2 p-10 flex flex-col justify-between bg-gradient-to-r from-[#20252b] to-[#1e222b] animate-on-load delay-100">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-stretch h-full w-full">
+                        <div class="flex flex-col mb-8 md:mb-0 w-full md:w-3/5">
+                            <h3 class="text-2xl font-display text-[#c4c698] mb-2 uppercase tracking-wider">定制棚拍企划</h3>
+                            <p class="text-sm font-normal text-[#8b92a5] mb-6 tracking-widest">Studio Plan</p>
+                            <ul class="space-y-3 text-[#8b92a5] text-xs font-medium tracking-wide">
+                                <li class="flex items-start"><span class="mr-3 text-[#c4c698] text-sm leading-none mt-0.5">✦</span> 专业影棚灯光阵列布置与重塑</li>
+                                <li class="flex items-start"><span class="mr-3 text-[#c4c698] text-sm leading-none mt-0.5">✦</span> 高质感服装细节与特效光渲染</li>
+                                <li class="flex items-start"><span class="mr-3 text-[#c4c698] text-sm leading-none mt-0.5">✦</span> 极致后期处理与质感提升</li>
+                            </ul>
+                        </div>
+                        <div class="flex flex-col justify-between items-start md:items-end w-full md:w-auto h-full">
+                            <div class="text-4xl font-display text-white mb-8 md:mb-0">¥299 <span class="text-xs font-normal text-[#8b92a5]">/套</span></div>
+                            <a href="portal.html" class="inline-block text-[10px] font-black tracking-widest text-[#1e222b] bg-[#c4c698] hover:bg-white transition-colors py-3 px-8 rounded-full uppercase mt-auto">立即自助预约</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio" class="py-24 px-6 max-w-7xl mx-auto border-t border-white/5">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 animate-on-load">
+                <div>
+                    <h2 class="font-display text-4xl text-white mb-2 uppercase">作品图库</h2>
+                    <p class="text-[#8b92a5] text-[10px] font-bold uppercase tracking-[0.3em]">Work Archives</p>
+                </div>
+            </div>
+            <div id="gallery-container" class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <p class="text-[#8b92a5] text-sm col-span-5">加载作品库中...</p>
+            </div>
+        </section>
+
+        <section id="workflow" class="py-24 px-6 max-w-5xl mx-auto border-t border-white/5 animate-on-load">
+            <div class="text-center mb-16">
+                <h2 class="font-display text-4xl text-white mb-4 tracking-[0.3em] uppercase">流程须知</h2>
+                <p class="text-[#8b92a5] text-xs tracking-widest uppercase">Flow</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-16">
+                <div class="relative">
+                    <div class="absolute -top-12 -left-6 text-9xl font-black text-white opacity-[0.015] select-none">01</div>
+                    <h4 class="text-sm font-black text-[#6fa8a5] mb-4 border-b border-white/10 pb-2 uppercase tracking-widest">Consulting</h4>
+                    <p class="text-[#8b92a5] text-xs font-medium tracking-wide">提供角色、类型及风格参考。探讨呈现方式。</p>
+                </div>
+                <div class="relative mt-8 md:mt-0 md:top-12">
+                    <div class="absolute -top-12 -left-6 text-9xl font-black text-white opacity-[0.015] select-none">02</div>
+                    <h4 class="text-sm font-black text-[#e2bac8] mb-4 border-b border-white/10 pb-2 uppercase tracking-widest">Booking</h4>
+                    <p class="text-[#8b92a5] text-xs font-medium tracking-wide">确认细节及报价，进入自助系统锁定档期。</p>
+                </div>
+                <div class="relative">
+                    <div class="absolute -top-12 -left-6 text-9xl font-black text-white opacity-[0.015] select-none">03</div>
+                    <h4 class="text-sm font-black text-[#c4c698] mb-4 border-b border-white/10 pb-2 uppercase tracking-widest">Execution</h4>
+                    <p class="text-[#8b92a5] text-xs font-medium tracking-wide">线下拍摄。结束后提供原片，挑选心仪画面。</p>
+                </div>
+                <div class="relative mt-8 md:mt-0 md:top-12">
+                    <div class="absolute -top-12 -left-6 text-9xl font-black text-white opacity-[0.015] select-none">04</div>
+                    <h4 class="text-sm font-black text-white mb-4 border-b border-white/10 pb-2 uppercase tracking-widest">Delivery</h4>
+                    <p class="text-[#8b92a5] text-xs font-medium tracking-wide">高规格后期精修介入，最终交付高清原件。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-32 px-6 max-w-5xl mx-auto border-t border-white/5 animate-on-load">
+            <div class="text-center mb-16">
+                <h2 class="font-display text-4xl text-white mb-4 tracking-[0.3em] uppercase">联系咨询</h2>
+                <p class="text-[#8b92a5] text-xs tracking-widest uppercase">提交咨询留言 · 或直接通过微信联系</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="constraint-card p-8 bg-[#20252b]">
+                    <h3 class="text-white font-bold mb-6 flex items-center gap-2">
+                        <span class="w-2 h-4 bg-[#6fa8a5] rounded-full inline-block"></span>
+                        在线咨询登记
+                    </h3>
+                    <form id="msgForm" class="space-y-4">
+                        <div><input type="text" id="msgName" required placeholder="您的称呼 / CN" class="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-[#6fa8a5] outline-none transition"></div>
+                        <div><input type="text" id="msgContact" required placeholder="您的微信号或QQ号" class="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-[#e2bac8] outline-none transition"></div>
+                        <div><textarea id="msgContent" required placeholder="想咨询什么内容？..." rows="4" class="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-[#c4c698] outline-none transition resize-none"></textarea></div>
+                        <button type="submit" id="msgSubmitBtn" class="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-gray-200 transition tracking-widest text-sm uppercase">提交咨询 (Submit)</button>
+                    </form>
+                    <div id="msgSuccess" class="hidden text-center text-[#6fa8a5] text-xs font-bold mt-4 tracking-widest p-4 bg-[#6fa8a5]/10 rounded-xl border border-[#6fa8a5]/30">提交成功！我们会尽快联系您。</div>
+                </div>
+                <div class="flex flex-col justify-center gap-6">
+                    <div class="constraint-card py-6 px-8 flex items-center gap-6 hover:bg-white hover:text-black cursor-pointer group transition-colors">
+                        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-black/5"><svg class="w-5 h-5 text-[#8b92a5] group-hover:text-black" fill="currentColor" viewBox="0 0 24 24"><path d="M12.004 2C6.485 2 2.008 5.86 2.008 10.612c0 2.706 1.488 5.12 3.82 6.643-.284 1.343-1.026 2.716-1.054 2.771-.044.091-.016.195.068.257.086.064.204.062.29-.005.025-.018 1.834-1.378 3.268-1.573 1.096.31 2.308.483 3.596.483 5.522 0 10.003-3.86 10.003-8.613C22.007 5.86 17.525 2 12.004 2zm3.324 7.218c.613 0 1.11.455 1.11 1.018 0 .56-.497 1.016-1.11 1.016-.612 0-1.11-.456-1.11-1.016 0-.563.498-1.018 1.11-1.018zm-6.648 0c.613 0 1.11.455 1.11 1.018 0 .56-.497 1.016-1.11 1.016-.612 0-1.11-.456-1.11-1.016 0-.563.498-1.018 1.11-1.018z"/></svg></div>
+                        <div><span class="block text-[10px] font-black text-[#8b92a5] group-hover:text-gray-500 uppercase tracking-widest mb-1">WeChat</span><span class="block text-xl font-bold select-all">zhao2243511192</span></div>
+                    </div>
+                    <div class="constraint-card py-6 px-8 flex items-center gap-6 hover:bg-white hover:text-black cursor-pointer group transition-colors">
+                        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-black/5"><span class="font-black text-lg text-[#8b92a5] group-hover:text-black">Q</span></div>
+                        <div><span class="block text-[10px] font-black text-[#8b92a5] group-hover:text-gray-500 uppercase tracking-widest mb-1">QQ Group</span><span class="block text-xl font-bold select-all">3921209139</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer class="py-12 text-center border-t border-white/5 text-[10px] text-[#8b92a5] font-bold tracking-[0.3em] uppercase"><p>© 2026 ZERO STUDIO. ALL RIGHTS RESERVED.</p></footer>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navGroup = document.getElementById('nav-group'); const indicator = document.getElementById('nav-indicator'); const items = document.querySelectorAll('.nav-item');
+            items.forEach(item => { item.addEventListener('mouseenter', (e) => { const itemRect = e.target.getBoundingClientRect(); const groupRect = navGroup.getBoundingClientRect(); const offsetLeft = itemRect.left - groupRect.left; indicator.style.width = `${itemRect.width}px`; indicator.style.transform = `translateX(${offsetLeft}px)`; indicator.style.opacity = '1'; }); });
+            navGroup.addEventListener('mouseleave', () => { indicator.style.opacity = '0'; });
+            const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.style.animation = 'none'; void entry.target.offsetHeight; entry.target.style.animation = ''; } else { entry.target.style.animation = 'none'; } }); }, { threshold: 0.15 });
+            document.querySelectorAll('.animate-on-load').forEach((el) => observer.observe(el));
+
+            function fetchSettings() {
+                fetch('/api/settings').then(res => res.json()).then(data => {
+                    if (data) { 
+                        if (data.notice) document.getElementById('notice-text').innerText = data.notice; 
+                        if (data.price_cz) document.getElementById('price-cz').innerText = data.price_cz; 
+                        if (data.price_hgh) document.getElementById('price-hgh').innerText = data.price_hgh; 
+                    }
+                }).catch(e => console.error(e));
+            }
+            fetchSettings(); setInterval(fetchSettings, 10000);
+
+            fetch('/api/photos').then(res => res.json()).then(photos => {
+                const container = document.getElementById('gallery-container'); let html = '';
+                const indexPhotos = photos ? photos.filter(p => p.display_location === '首页画廊' || p.display_location === '双端展示') : [];
+                indexPhotos.slice(0, 4).forEach((p, index) => { const delayClass = `delay-${(index % 4 + 1) * 100}`; html += `<div class="aspect-[3/4] constraint-card group relative animate-on-load ${delayClass}"><img src="${p.url}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105"></div>`; });
+                html += `<a href="portfolio.html" class="aspect-[3/4] constraint-card group relative flex flex-col items-center justify-center animate-on-load delay-500 hover:bg-white/10 transition-colors cursor-pointer"><div class="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center mb-4 group-hover:scale-110 transition duration-300"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></div><span class="block text-white text-base font-bold tracking-[0.2em] mb-1">所有作品</span></a>`;
+                container.innerHTML = html; document.querySelectorAll('#gallery-container .animate-on-load').forEach((el) => observer.observe(el));
+            });
+
+            document.getElementById('msgForm').addEventListener('submit', function(e) {
+                e.preventDefault(); const btn = document.getElementById('msgSubmitBtn'); btn.innerText = "发送中..."; btn.classList.add("opacity-50", "cursor-not-allowed");
+                fetch('/api/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: document.getElementById('msgName').value, contact: document.getElementById('msgContact').value, content: document.getElementById('msgContent').value }) })
+                .then(res => res.json()).then(data => { if(data.status === 'ok') { document.getElementById('msgForm').classList.add('hidden'); document.getElementById('msgSuccess').classList.remove('hidden'); } })
+                .catch(err => { btn.innerText = "发送失败，请重试"; btn.classList.remove("opacity-50", "cursor-not-allowed"); });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZERO STUDIO | 自助锁档系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;900&family=Noto+Sans+SC:wght@300;400;700;900&display=swap');
+        :root { --bg-color: #161a21; --card-bg: rgba(30, 34, 43, 0.4); --color-teal: #6fa8a5; --color-pink: #e2bac8; }
+        body { background: radial-gradient(circle at 50% 50%, rgba(45, 52, 64, 0.5) 0%, rgba(22, 26, 33, 1) 100%), var(--bg-color); color: #eef0f4; font-family: 'Montserrat', 'Noto Sans SC', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .constraint-card { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 2rem; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        .time-slot.selected { background-color: var(--color-teal); color: #161a21; border-color: var(--color-teal); font-weight: bold; }
+        .time-slot.disabled { opacity: 0.4; cursor: not-allowed; border-color: rgba(239, 68, 68, 0.3); color: #ef4444; }
+        select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%238b92a5%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 1rem top 50%; background-size: 0.65rem auto; }
+        select option { background-color: #161a21; color: white; }
+    </style>
+</head>
+<body class="antialiased p-6 py-12">
+
+    <div id="login-view" class="constraint-card w-full max-w-md p-10 animate-[fadeIn_0.5s_ease-out]">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-black tracking-[0.3em] uppercase mb-2">ZERO</h1>
+            <p class="text-[#8b92a5] text-[10px] font-bold tracking-widest uppercase">Client Portal / 查看档期</p>
+        </div>
+        <div class="space-y-5">
+            <div>
+                <label class="block text-xs text-[#8b92a5] font-bold tracking-widest mb-2 uppercase text-center">输入您的微信号进入</label>
+                <input type="text" id="wechatInput" placeholder="WeChat ID..." class="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white text-sm focus:border-[#6fa8a5] outline-none transition text-center tracking-wider">
+            </div>
+            <button onclick="verifyLogin()" id="loginBtn" class="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-gray-200 transition tracking-[0.2em] text-sm uppercase mt-4">进入查看档期</button>
+            <div class="text-center pt-2"><button onclick="logout()" class="text-[#8b92a5] text-xs hover:text-white transition underline underline-offset-4">返回主页</button></div>
+        </div>
+    </div>
+
+    <div id="booking-view" class="constraint-card w-full max-w-2xl p-8 md:p-10 hidden animate-[fadeIn_0.5s_ease-out]">
+        
+        <div id="portalNoticeBox" class="mb-8 p-4 bg-[#6fa8a5]/10 border border-[#6fa8a5]/30 rounded-xl hidden">
+            <p class="text-[#6fa8a5] text-xs font-bold tracking-widest mb-1">✦ 预约须知 Notice</p>
+            <p id="portalNoticeText" class="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap"></p>
+        </div>
+
+        <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-6">
+            <div>
+                <h2 class="text-2xl font-black tracking-widest uppercase mb-1">自助锁档</h2>
+                <p class="text-[#8b92a5] text-xs font-bold tracking-widest">Client: <span id="clientNameDisplay" class="text-white"></span></p>
+            </div>
+            <button onclick="logout()" class="text-[#8b92a5] text-xs hover:text-white transition underline underline-offset-4">放弃退出</button>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="md:col-span-2">
+                <label class="block text-xs text-[#8b92a5] font-bold tracking-widest mb-3 uppercase">选择活动企划</label>
+                <select id="eventSelect" onchange="handleEventChange()" class="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white text-sm focus:border-[#6fa8a5] outline-none transition cursor-pointer">
+                    <option value="" disabled selected>-- 载入中 --</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs text-[#8b92a5] font-bold tracking-widest mb-3 uppercase">拍摄日期</label>
+                <select id="dateSelect" onchange="handleDateChange()" class="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white text-sm focus:border-[#6fa8a5] outline-none transition cursor-pointer" disabled>
+                    <option value="" disabled selected>-- 先选择活动 --</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs text-[#e2bac8] font-bold tracking-widest mb-3 uppercase">拍摄时段 (可多选)</label>
+                <div class="grid grid-cols-2 gap-3" id="timeSlots">
+                    <p class="text-gray-500 text-xs col-span-2 mt-2">-- 请先选择日期 --</p>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs text-[#8b92a5] font-bold tracking-widest mb-3 uppercase">您的 CN (称呼)</label>
+                <input type="text" id="cnInput" placeholder="输入您的CN" class="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white text-sm focus:border-[#6fa8a5] outline-none transition">
+            </div>
+            <div>
+                <label class="block text-xs text-[#8b92a5] font-bold tracking-widest mb-3 uppercase">拍摄角色/风格</label>
+                <input type="text" id="characterInput" placeholder="例如：初音未来 / JK" class="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white text-sm focus:border-[#6fa8a5] outline-none transition">
+            </div>
+            
+            <div>
+                <label class="block text-xs text-[#8b92a5] font-bold tracking-widest mb-3 uppercase">预约数量 (张/套)</label>
+                <input type="number" id="qtyInput" value="1" min="1" class="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white text-sm focus:border-[#6fa8a5] outline-none transition">
+            </div>
+            <div class="space-y-2">
+                <label class="block text-[10px] uppercase tracking-[0.2em] text-[#6fa8a5] font-bold">选择预约项目</label>
+                <select id="depositSelect" class="w-full bg-[#1e222b] border border-white/10 p-4 rounded-xl focus:ring-2 focus:ring-[#6fa8a5] outline-none transition-all text-white font-medium">
+                </select>
+            </div>
+
+            <div class="md:col-span-2">
+                <label class="block text-xs text-[#8b92a5] font-bold tracking-widest mb-3 uppercase">其他要求 / 备注</label>
+                <textarea id="remarksInput" rows="2" placeholder="是否有特殊要求或想说的话..." class="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white text-sm focus:border-[#6fa8a5] outline-none transition resize-none"></textarea>
+            </div>
+
+            <div class="md:col-span-2 mt-2 pt-4 border-t border-white/10">
+                <label class="block text-xs text-[#e2bac8] font-bold tracking-widest mb-3 uppercase">输入预约口令 (防恶意锁定)</label>
+                <input type="text" id="inviteCodeInput" placeholder="请输入摄影师提供的口令" class="w-full bg-[#e2bac8]/10 border border-[#e2bac8]/50 rounded-xl p-4 text-[#e2bac8] text-sm focus:border-[#e2bac8] outline-none transition text-center tracking-[0.2em]">
+            </div>
+        </div>
+
+        <div class="mt-8 pt-4">
+            <button onclick="submitSchedule()" id="submitBtn" class="w-full bg-[#6fa8a5] text-[#161a21] font-black py-4 rounded-xl hover:bg-[#85c4c1] transition tracking-[0.2em] text-sm uppercase disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                请完善所有信息
+            </button>
+        </div>
+    </div>
+
+    <div id="success-view" class="constraint-card w-full max-w-md p-10 text-center hidden animate-[fadeIn_0.5s_ease-out]">
+        <div class="w-16 h-16 bg-[#6fa8a5]/20 rounded-full flex items-center justify-center mx-auto mb-4"><svg class="w-8 h-8 text-[#6fa8a5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>
+        <h2 class="text-2xl font-black tracking-widest uppercase mb-2">档期已锁定</h2>
+        <p class="text-[#8b92a5] text-xs mb-6 leading-relaxed">您的拍摄信息已成功记录并实时推送给摄影师。</p>
+        
+        <div id="payQrBox" class="hidden mb-8 p-4 bg-white rounded-xl">
+            <p class="text-[#161a21] font-bold text-sm mb-2 tracking-widest">长按识别二维码付定金</p>
+            <img id="payQrImg" src="" class="w-full h-auto rounded-lg shadow-sm border border-gray-100">
+            <p class="text-xs text-gray-500 mt-2">支付后请截图发给摄影师</p>
+        </div>
+
+        <button onclick="logout()" class="inline-block border border-white/20 text-white font-bold py-3 px-8 rounded-full hover:bg-white/10 transition tracking-widest text-xs uppercase">返回主页</button>
+    </div>
+
+    <script>
+        let currentWechat = '';
+        let selectedTimes = []; 
+        let eventsData = [];
+        let bookedSlots = []; 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/booked-times', { cache: 'no-store' }).then(res => {
+                console.log('Response status:', res.status);
+                return res.json();
+            }).then(data => {
+                bookedSlots = data;
+                console.log('bookedSlots loaded:', JSON.stringify(bookedSlots));
+            }).catch(err => {
+                console.error('Error fetching booked times:', err);
+            });
+            fetch('/api/portal_settings').then(res => res.json()).then(data => {
+                if(data.notice) {
+                    document.getElementById('portalNoticeBox').classList.remove('hidden');
+                    document.getElementById('portalNoticeText').innerText = data.notice;
+                }
+                eventsData = data.events || [];
+                const eventSelect = document.getElementById('eventSelect');
+                if(eventsData.length === 0) {
+                    eventSelect.innerHTML = '<option value="" disabled selected>暂无开放活动</option>';
+                    return;
+                }
+                eventSelect.innerHTML = '<option value="" disabled selected>-- 请选择企划活动 --</option>';
+                eventsData.forEach((ev, idx) => eventSelect.innerHTML += `<option value="${idx}">${ev.name}</option>`);
+                
+                // 动态渲染价格项目
+                const depositSelect = document.getElementById('depositSelect');
+                depositSelect.innerHTML = ''; // 清空
+                
+                if (data.price_options) {
+                    const lines = data.price_options.split('\n');
+                    lines.forEach(line => {
+                        const parts = line.split('|');
+                        if (parts.length === 2) {
+                            const name = parts[0].trim();
+                            const price = parts[1].trim();
+                            const opt = document.createElement('option');
+                            opt.value = price; // 提交给后台的金额
+                            opt.textContent = `${name} - ￥${price}`; // 显示给用户的文字
+                            depositSelect.appendChild(opt);
+                        }
+                    });
+                }
+            });
+        });
+
+        function handleEventChange() {
+            const idx = document.getElementById('eventSelect').value;
+            const ev = eventsData[idx];
+            const dateSelect = document.getElementById('dateSelect');
+            selectedTimes = [];
+            
+            dateSelect.disabled = false;
+            dateSelect.innerHTML = '<option value="" disabled selected>-- 请选择日期 --</option>';
+            ev.dates.split(/[,，]/).forEach(d => {
+                if(d.trim()) dateSelect.innerHTML += `<option value="${d.trim()}">${d.trim()}</option>`;
+            });
+            document.getElementById('timeSlots').innerHTML = '<p class="text-gray-500 text-xs col-span-2 mt-2">-- 请先选择日期 --</p>';
+            checkFormReady();
+        }
+
+        function handleDateChange() {
+            const idx = document.getElementById('eventSelect').value;
+            const dateStr = document.getElementById('dateSelect').value;
+            const ev = eventsData[idx];
+            selectedTimes = [];
+            
+            const timeContainer = document.getElementById('timeSlots');
+            timeContainer.innerHTML = '';
+            ev.times.split(/[,，]/).forEach(t => {
+                const tStr = t.trim();
+                if(tStr) {
+                    const isBooked = bookedSlots.some(b => b.date === dateStr && b.time === tStr);
+                    console.log(`DEBUG - dateStr: '${dateStr}', tStr: '${tStr}'`);
+                    console.log(`DEBUG - bookedSlots length: ${bookedSlots.length}`);
+                    console.log(`DEBUG - bookedSlots content:`, JSON.stringify(bookedSlots));
+                    console.log(`DEBUG - isBooked: ${isBooked}`);
+                    if(isBooked) {
+                        timeContainer.innerHTML += `<button disabled class="time-slot disabled border border-red-500/30 rounded-xl p-3 text-xs line-through">${tStr} (已满)</button>`;
+                    } else {
+                        timeContainer.innerHTML += `<button class="time-slot border border-white/10 rounded-xl p-3 text-xs text-[#8b92a5] hover:border-white/30 transition" onclick="toggleTime(this, '${tStr}')">${tStr}</button>`;
+                    }
+                }
+            });
+            checkFormReady();
+        }
+
+        function verifyLogin() {
+            const vx = document.getElementById('wechatInput').value.trim();
+            // 登录页面移除了口令验证，只验证微信号
+            if(!vx) return alert("请输入微信号！");
+            
+            document.getElementById('loginBtn').innerText = "进入中...";
+            setTimeout(() => {
+                currentWechat = vx;
+                document.getElementById('clientNameDisplay').innerText = vx;
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('booking-view').classList.remove('hidden');
+            }, 300);
+        }
+
+        function toggleTime(element, timeString) {
+            if(element.classList.contains('disabled')) return;
+            
+            if(selectedTimes.includes(timeString)) {
+                selectedTimes = selectedTimes.filter(t => t !== timeString);
+                element.classList.remove('selected');
+            } else {
+                selectedTimes.push(timeString);
+                element.classList.add('selected');
+            }
+            checkFormReady();
+        }
+
+        // 监听所有必填项
+        document.getElementById('cnInput').addEventListener('input', checkFormReady);
+        document.getElementById('characterInput').addEventListener('input', checkFormReady);
+        document.getElementById('qtyInput').addEventListener('input', checkFormReady);
+        document.getElementById('depositSelect').addEventListener('change', checkFormReady);
+        document.getElementById('inviteCodeInput').addEventListener('input', checkFormReady);
+
+        function checkFormReady() {
+            const eventIdx = document.getElementById('eventSelect').value;
+            const dateStr = document.getElementById('dateSelect').value;
+            const cn = document.getElementById('cnInput').value.trim();
+            const char = document.getElementById('characterInput').value.trim();
+            const qty = document.getElementById('qtyInput').value;
+            const deposit = document.getElementById('depositSelect').value; // 检查是否选择了预约项目
+            const code = document.getElementById('inviteCodeInput').value.trim(); // 检查口令是否填写
+            const btn = document.getElementById('submitBtn');
+            
+            // 必须选中至少一个时间段，且所有必填项（包括口令和预约项目）都填了才允许提交
+            if(eventIdx && dateStr && selectedTimes.length > 0 && cn && char && qty >= 1 && deposit && code) {
+                btn.disabled = false;
+                btn.innerText = `锁定 ${selectedTimes.length} 个时段`;
+            } else {
+                btn.disabled = true;
+                btn.innerText = "请完善信息并填写口令";
+            }
+        }
+
+        function submitSchedule() {
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "提交验证中..."; btn.disabled = true;
+
+            const idx = document.getElementById('eventSelect').value;
+            const payload = {
+                wechat: currentWechat,
+                invite_code: document.getElementById('inviteCodeInput').value.trim(), // 获取口令传给后端
+                cn: document.getElementById('cnInput').value.trim(),
+                character: document.getElementById('characterInput').value.trim(),
+                event_name: eventsData[idx].name,
+                date: document.getElementById('dateSelect').value,
+                times: selectedTimes, 
+                deposit: document.getElementById('depositSelect').value,
+                quantity: document.getElementById('qtyInput').value,
+                remarks: document.getElementById('remarksInput').value.trim()
+            };
+
+            fetch('/api/save-schedule', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+            }).then(res => res.json()).then(data => {
+                if(data.status === 'ok') {
+                    document.getElementById('booking-view').classList.add('hidden');
+                    document.getElementById('success-view').classList.remove('hidden');
+                    
+                    if(data.pay_qr) {
+                        document.getElementById('payQrBox').classList.remove('hidden');
+                        document.getElementById('payQrImg').src = data.pay_qr;
+                    }
+                } else {
+                    alert(data.message || "提交失败");
+                    btn.innerText = "重新锁定"; btn.disabled = false;
+                    // 刷新一下最新的被占用的时间
+                    fetch('/api/booked-times').then(res => res.json()).then(d => { bookedSlots = d; handleDateChange(); });
+                }
+            }).catch(err => { alert("网络错误"); btn.innerText = "确认锁定"; btn.disabled = false; });
+        }
+
+        function logout() { window.location.href = 'index.html'; }
+    </script>
+</body>
+</html>

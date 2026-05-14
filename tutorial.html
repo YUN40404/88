@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZERO STUDIO 使用教程</title>
+    <style>
+        :root {
+            --bg: #161a21;
+            --card: #202633;
+            --text: #eef0f4;
+            --muted: #9aa3b5;
+            --teal: #6fa8a5;
+            --pink: #e2bac8;
+            --line: rgba(255,255,255,.1);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif;
+            background: radial-gradient(circle at top, #283140 0, var(--bg) 45%);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        a { color: var(--teal); }
+        header, main { width: min(1080px, calc(100% - 32px)); margin: 0 auto; }
+        header { padding: 72px 0 40px; }
+        .eyebrow { color: var(--pink); letter-spacing: .24em; font-size: 12px; font-weight: 800; text-transform: uppercase; }
+        h1 { margin: 12px 0 18px; font-size: clamp(34px, 7vw, 72px); line-height: 1.05; }
+        h2 { margin-top: 0; font-size: 26px; }
+        h3 { color: var(--teal); margin-bottom: 8px; }
+        p { color: var(--muted); }
+        .hero-text { max-width: 720px; font-size: 18px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+        .card {
+            background: rgba(32, 38, 51, .82);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 24px 60px rgba(0,0,0,.22);
+        }
+        .step { counter-increment: step; position: relative; padding-left: 54px; }
+        .step::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--teal);
+            color: #10141b;
+            display: grid;
+            place-items: center;
+            font-weight: 900;
+        }
+        code, pre {
+            background: rgba(0,0,0,.35);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+        }
+        code { padding: 2px 7px; }
+        pre { overflow-x: auto; padding: 16px; color: #d7f3f1; }
+        .toc { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+        .toc a {
+            text-decoration: none;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 8px 14px;
+            background: rgba(255,255,255,.04);
+        }
+        section { margin-bottom: 22px; }
+        ul { padding-left: 20px; color: var(--muted); }
+        .warning { border-color: rgba(226,186,200,.45); background: rgba(226,186,200,.08); }
+        footer { text-align: center; color: var(--muted); padding: 36px 16px 56px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="eyebrow">ZERO STUDIO GUIDE</div>
+        <h1>摄影预约网站使用教程</h1>
+        <p class="hero-text">本项目是一个摄影展示与自助预约网站，包含首页、作品页、客户预约入口和后台管理系统。按照下面步骤即可在本地运行、管理内容并准备上线。</p>
+        <nav class="toc">
+            <a href="#structure">项目结构</a>
+            <a href="#start">启动网站</a>
+            <a href="#pages">页面说明</a>
+            <a href="#admin">后台管理</a>
+            <a href="#deploy">上传与部署</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="structure" class="card">
+            <h2>一、项目结构</h2>
+            <div class="grid">
+                <div><h3>index.html</h3><p>网站首页，展示服务、价格、公告、作品入口与联系方式。</p></div>
+                <div><h3>portfolio.html</h3><p>作品图库页面，用于展示摄影作品。</p></div>
+                <div><h3>portal.html</h3><p>客户自助预约页面，用于查看活动、选择日期和锁定时间段。</p></div>
+                <div><h3>admin.html</h3><p>后台管理页面，用于修改公告、价格、活动、预约和留言。</p></div>
+                <div><h3>server.js</h3><p>Node.js 后端服务，提供接口、上传、数据库读写和通知功能。</p></div>
+                <div><h3>data.db / uploads</h3><p>SQLite 数据库与上传图片目录，保存预约、留言、配置和图片。</p></div>
+            </div>
+        </section>
+
+        <section id="start" class="card">
+            <h2>二、本地启动网站</h2>
+            <div class="step">
+                <h3>安装依赖</h3>
+                <p>第一次使用时，在项目目录运行：</p>
+                <pre><code>npm install</code></pre>
+            </div>
+            <div class="step">
+                <h3>设置后台账号和通知 Token</h3>
+                <p>推荐使用环境变量，不要把密码或通知 Token 写死在代码里：</p>
+                <pre><code>export ADMIN_USER="admin"
+export ADMIN_PASSWORD="你的后台密码"
+export PUSHPLUS_TOKEN="你的 PushPlus Token，可不填"</code></pre>
+            </div>
+            <div class="step">
+                <h3>启动服务</h3>
+                <pre><code>node server.js</code></pre>
+                <p>启动后打开 <code>http://localhost:3000</code> 查看网站首页。</p>
+            </div>
+        </section>
+
+        <section id="pages" class="card">
+            <h2>三、前台页面使用</h2>
+            <ul>
+                <li>首页：打开 <code>/index.html</code>，查看服务介绍、价格、公告和预约入口。</li>
+                <li>作品页：打开 <code>/portfolio.html</code>，浏览摄影作品。</li>
+                <li>预约页：打开 <code>/portal.html</code>，客户输入微信号后选择活动、日期、时间段并提交信息。</li>
+                <li>留言：客户在首页提交咨询后，后台可以查看留言；如果配置了 PushPlus Token，会收到通知。</li>
+            </ul>
+        </section>
+
+        <section id="admin" class="card warning">
+            <h2>四、后台管理</h2>
+            <p>打开 <code>http://localhost:3000/admin.html</code>，输入环境变量中配置的后台账号和密码。</p>
+            <ul>
+                <li>修改首页公告和地区价格。</li>
+                <li>配置预约页公告、活动、日期、时间段、每时段容量和预约口令。</li>
+                <li>查看、修改或删除客户预约记录。</li>
+                <li>上传作品图片并管理图库内容。</li>
+                <li>查看客户留言。</li>
+            </ul>
+            <p>重要：正式上线前一定要设置自己的 <code>ADMIN_PASSWORD</code>，不要使用默认密码。</p>
+        </section>
+
+        <section id="deploy" class="card">
+            <h2>五、上传 GitHub 与部署建议</h2>
+            <ul>
+                <li>上传 GitHub 前建议忽略 <code>node_modules</code>、<code>.DS_Store</code>、日志文件和本地数据库。</li>
+                <li>如果需要保留示例数据，可以单独准备一个脱敏后的示例数据库。</li>
+                <li>部署时选择支持 Node.js 和 SQLite 持久化存储的平台。</li>
+                <li>线上环境需要配置 <code>ADMIN_USER</code>、<code>ADMIN_PASSWORD</code>、<code>PUSHPLUS_TOKEN</code> 等环境变量。</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>ZERO STUDIO · 使用教程</footer>
+</body>
+</html>

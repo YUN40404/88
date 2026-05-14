@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>ZERO STUDIO | 后台管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-6 md:p-12 font-sans text-gray-800">
+
+    <div id="editModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white p-8 rounded-2xl w-full max-w-lg relative">
+            <h3 class="text-xl font-bold mb-4">修改档期数据</h3>
+            <input type="hidden" id="edit_id">
+            <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="text-xs font-bold">微信</label><input type="text" id="edit_wechat" class="w-full border p-2 rounded"></div>
+                    <div><label class="text-xs font-bold">CN</label><input type="text" id="edit_cn" class="w-full border p-2 rounded"></div>
+                </div>
+                <div><label class="text-xs font-bold">角色</label><input type="text" id="edit_character" class="w-full border p-2 rounded"></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="text-xs font-bold">日期</label><input type="text" id="edit_date" class="w-full border p-2 rounded"></div>
+                    <div><label class="text-xs font-bold">时间</label><input type="text" id="edit_time" class="w-full border p-2 rounded"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="text-xs font-bold">状态</label><select id="edit_deposit" class="w-full border p-2 rounded"><option>已付定金</option><option>未付定金</option></select></div>
+                    <div><label class="text-xs font-bold">数量</label><input type="number" id="edit_qty" class="w-full border p-2 rounded"></div>
+                </div>
+                <div><label class="text-xs font-bold">备注</label><input type="text" id="edit_remarks" class="w-full border p-2 rounded"></div>
+            </div>
+            <div class="flex gap-4 mt-6">
+                <button onclick="submitEdit()" class="flex-1 bg-teal-600 text-white py-2 rounded font-bold">保存修改</button>
+                <button onclick="document.getElementById('editModal').classList.replace('flex','hidden')" class="flex-1 bg-gray-200 text-gray-800 py-2 rounded font-bold">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto space-y-8">
+        
+        <div class="flex items-center justify-between">
+            <h1 class="text-3xl font-black text-gray-900 tracking-wider">网站内容管理</h1>
+            <a href="index.html" target="_blank" class="text-sm text-teal-600 font-bold hover:underline">查看网站首页 →</a>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-xl font-bold mb-6 border-b pb-3 flex items-center gap-2"><span class="w-2 h-6 bg-teal-500 rounded"></span> 首页文案与价格</h2>
+                <div class="space-y-5">
+                    <div><label class="block text-sm font-bold text-gray-700 mb-2">首页公告</label><textarea id="noticeInput" rows="3" class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none resize-none"></textarea></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-sm font-bold text-gray-700 mb-2">石家庄地区价格 (¥)</label><input type="number" id="priceInput" class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"></div>
+                        <div><label class="block text-sm font-bold text-gray-700 mb-2">沪广杭地区价格 (¥)</label><input type="number" id="priceInputHgh" class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"></div>
+                    </div>
+                    <button onclick="saveSettings()" class="w-full bg-teal-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-teal-700 transition">保存首页修改</button>
+                    <p id="saveMsg" class="text-teal-600 text-center text-sm font-bold hidden mt-3">保存成功！</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+                <h2 class="text-xl font-bold mb-6 border-b pb-3 flex items-center justify-between">
+                    <span class="flex items-center gap-2"><span class="w-2 h-6 bg-purple-500 rounded"></span> 自助系统配置</span>
+                    <button onclick="addEvent()" class="text-xs bg-purple-100 text-purple-600 px-3 py-1 rounded-md font-bold hover:bg-purple-200">+ 新增活动</button>
+                </h2>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-2">防刷预约口令</label>
+                        <input type="text" id="inviteCodeInput" class="w-full border border-gray-300 p-2 rounded-lg text-sm" placeholder="例如：zero2026">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-2">微信收款码图片链接</label>
+                        <input type="text" id="payQrInput" class="w-full border border-gray-300 p-2 rounded-lg text-sm" placeholder="填入图片URL(可选)">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-2">预约页置顶公告</label>
+                    <textarea id="portalNoticeInput" rows="2" class="w-full border border-gray-300 p-2 rounded-lg mb-4 text-sm" placeholder="例如：拍前必读..."></textarea>
+                </div>
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    <label class="block text-xs font-bold mb-1 text-blue-800">每时段容量 (剩余选择次数)</label>
+                    <input type="number" id="cfg-capacity" class="w-full border p-2 rounded text-sm" placeholder="1" min="1">
+                    <p class="text-[10px] text-blue-600 mt-1">注：设置为 3 则表示同一个时间段可以被 3 个不同的人预约。</p>
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-gray-700">石家庄地区价格 (元/4张)</label>
+                        <input type="number" id="cfg-price-cz" class="w-full border p-2 rounded text-sm" placeholder="80" min="0">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-gray-700">沪广杭地区价格 (元/4张)</label>
+                        <input type="number" id="cfg-price-hgh" class="w-full border p-2 rounded text-sm" placeholder="180" min="0">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="block text-xs font-bold mb-1 text-gray-700">项目与价格设置 (每行一个)</label>
+                    <textarea id="cfg-prices" class="w-full border p-2 rounded text-sm h-28 font-mono"
+                              placeholder="格式：项目名称|金额&#10;例如：&#10;石家庄场照(4张)|80&#10;沪广杭场照(4张)|180"></textarea>
+                    <p class="text-[10px] text-gray-400 mt-1">* 请使用竖线 | 分隔名称和数字，不要有空格。</p>
+                </div>
+                <div id="eventsContainer" class="space-y-4 max-h-[160px] overflow-y-auto pr-2 flex-grow"></div>
+                <div class="pt-4 border-t mt-4">
+                    <button onclick="savePortalSettings()" class="w-full bg-purple-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-purple-700 transition">保存系统配置</button>
+                    <p id="savePortalMsg" class="text-purple-600 text-center text-sm font-bold hidden mt-3">更新成功！</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <div class="flex justify-between items-center mb-6 border-b pb-3">
+                <h2 class="text-xl font-bold flex items-center gap-2"><span class="w-2 h-6 bg-orange-500 rounded"></span> 客户档期总览</h2>
+                <button onclick="exportCSV()" class="bg-green-600 text-white text-sm px-4 py-2 rounded shadow font-bold hover:bg-green-700">↓ 导出档期表格</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-600 min-w-max">
+                    <thead class="bg-gray-50 border-b border-gray-100">
+                        <tr>
+                            <th class="p-3 font-bold">微信/CN</th><th class="p-3 font-bold">角色/活动</th><th class="p-3 font-bold">日期时段</th>
+                            <th class="p-3 font-bold">定金/数量</th><th class="p-3 font-bold">备注</th><th class="p-3 font-bold text-center">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="booking-tbody" class="divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-xl font-bold mb-6 border-b pb-3 flex items-center gap-2"><span class="w-2 h-6 bg-pink-400 rounded"></span> 上传作品 (自动压缩)</h2>
+                <form id="uploadForm" class="space-y-5">
+                    <div class="grid grid-cols-3 gap-4">
+                        <div><input type="text" name="title" required placeholder="标题" class="w-full border p-2 rounded-lg text-sm"></div>
+                        <div><select name="category" class="w-full border p-2 rounded-lg text-sm"><option value="场照">场照</option><option value="棚拍">棚拍</option><option value="外景">外景</option></select></div>
+                        <div><select name="display_location" class="w-full border p-2 rounded-lg text-sm"><option value="首页画廊">仅首页</option><option value="个人档案">仅作品页</option><option value="双端展示">都展示</option></select></div>
+                    </div>
+                    <div><input type="file" id="photoInput" required accept="image/*" class="w-full border p-2 rounded-lg bg-gray-50 text-sm"></div>
+                    <button type="submit" class="w-full bg-pink-400 text-white py-3 rounded-lg font-bold">压缩并上传</button>
+                </form>
+            </div>
+
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-xl font-bold mb-6 border-b pb-3 flex items-center gap-2"><span class="w-2 h-6 bg-blue-500 rounded"></span> 网页留言</h2>
+                <div class="overflow-x-auto h-64">
+                    <table class="w-full text-left text-sm text-gray-600">
+                        <tbody id="msg-tbody" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-xl font-bold mb-6 border-b pb-3 flex items-center gap-2"><span class="w-2 h-6 bg-red-400 rounded"></span> 作品管理</h2>
+            <div id="admin-gallery" class="grid grid-cols-2 md:grid-cols-6 gap-4"></div>
+        </div>
+
+    </div>
+
+    <script>
+        fetch('/api/settings').then(res => res.json()).then(data => { 
+            if(data){ 
+                document.getElementById('noticeInput').value = data.notice || ''; 
+                document.getElementById('priceInput').value = data.price_cz || ''; 
+                document.getElementById('priceInputHgh').value = data.price_hgh || ''; 
+            } 
+        });
+        function saveSettings() {
+            fetch('/api/settings', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ 
+                    notice: document.getElementById('noticeInput').value, 
+                    price_cz: document.getElementById('priceInput').value,
+                    price_hgh: document.getElementById('priceInputHgh').value
+                }) 
+            }).then(res => { 
+                if(res.ok) { 
+                    document.getElementById('saveMsg').classList.remove('hidden'); 
+                    setTimeout(() => document.getElementById('saveMsg').classList.add('hidden'), 3000); 
+                } 
+            });
+        }
+
+        let portalEvents = [];
+        fetch('/api/portal_settings').then(res => res.json()).then(data => {
+            document.getElementById('portalNoticeInput').value = data.notice || '';
+            document.getElementById('inviteCodeInput').value = data.invite_code || '';
+            document.getElementById('payQrInput').value = data.pay_qr || '';
+            document.getElementById('cfg-capacity').value = data.slot_capacity || 1;
+            document.getElementById('cfg-price-cz').value = data.price_cz || 80;
+            document.getElementById('cfg-price-hgh').value = data.price_hgh || 180;
+            document.getElementById('cfg-prices').value = data.price_options || '';
+            portalEvents = data.events && data.events.length ? data.events : [{name: '', dates: '', times: ''}];
+            renderEvents();
+        });
+
+        function renderEvents() {
+            document.getElementById('eventsContainer').innerHTML = portalEvents.map((ev, idx) => `
+                <div class="bg-gray-50 p-3 rounded border relative">
+                    <button onclick="removeEvent(${idx})" class="absolute top-2 right-2 text-red-500 text-xs font-bold hover:underline">删除</button>
+                    <input type="text" class="w-full border p-1.5 rounded text-xs mb-2 event-name" value="${ev.name}" placeholder="活动名称">
+                    <input type="text" class="w-full border p-1.5 rounded text-xs mb-2 event-dates" value="${ev.dates}" placeholder="日期(逗号分隔)">
+                    <input type="text" class="w-full border p-1.5 rounded text-xs event-times" value="${ev.times}" placeholder="时段(逗号分隔)">
+                </div>`).join('');
+        }
+        function addEvent() { portalEvents.push({name: '', dates: '', times: ''}); renderEvents(); }
+        function removeEvent(idx) { portalEvents.splice(idx, 1); renderEvents(); }
+
+        function savePortalSettings() {
+            const names = document.querySelectorAll('.event-name'), dates = document.querySelectorAll('.event-dates'), times = document.querySelectorAll('.event-times');
+            const evs = [];
+            for(let i=0; i<names.length; i++) if(names[i].value.trim()) evs.push({name: names[i].value, dates: dates[i].value, times: times[i].value});
+            fetch('/api/portal_settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ 
+                notice: document.getElementById('portalNoticeInput').value, 
+                invite_code: document.getElementById('inviteCodeInput').value,
+                pay_qr: document.getElementById('payQrInput').value,
+                slot_capacity: parseInt(document.getElementById('cfg-capacity').value) || 1,
+                price_cz: parseInt(document.getElementById('cfg-price-cz').value) || 80,
+                price_hgh: parseInt(document.getElementById('cfg-price-hgh').value) || 180,
+                price_options: document.getElementById('cfg-prices').value,
+                events: evs 
+            }) }).then(res => { if(res.ok) { document.getElementById('savePortalMsg').classList.remove('hidden'); setTimeout(() => document.getElementById('savePortalMsg').classList.add('hidden'), 3000); } });
+        }
+
+        let allBookings = [];
+        function loadBookings() {
+            fetch('/api/bookings').then(res => res.json()).then(msgs => {
+                allBookings = msgs;
+                const tbody = document.getElementById('booking-tbody');
+                if(msgs.length === 0) return tbody.innerHTML = '<tr><td colspan=\"6\" class=\"p-4 text-center text-gray-400\">暂无预约</td></tr>';
+                tbody.innerHTML = msgs.map(m => `
+                    <tr class="hover:bg-orange-50/50">
+                        <td class="p-3"><b class="block text-gray-900">${m.cn}</b><span class="text-xs text-gray-500">微信: ${m.wechat}</span></td>
+                        <td class="p-3"><b class="block text-gray-900">${m.character}</b><span class="text-xs text-orange-500">${m.event_name}</span></td>
+                        <td class="p-3 font-mono text-gray-700 text-xs">${m.date}<br><span class="text-blue-600">${m.time || '未选时段'}</span></td>
+                        <td class="p-3 text-xs"><span class="${(m.deposit||'').includes('未付') ? 'text-red-500' : 'text-green-600'} font-bold">${m.deposit}</span><br>数量：${m.quantity}</td>
+                        <td class="p-3 text-xs max-w-xs truncate" title="${m.remarks||'无'}">${m.remarks || '-'}</td>
+                        <td class="p-3 text-center space-x-2">
+                            <button onclick='openEditModal(${JSON.stringify(m)})' class="text-blue-500 hover:underline text-xs font-bold">修改</button>
+                            <button onclick="deleteBooking(${m.id})" class="text-red-500 hover:underline text-xs font-bold">删除</button>
+                        </td>
+                    </tr>`).join('');
+            });
+        }
+        loadBookings();
+
+        function exportCSV() {
+            if(allBookings.length === 0) return alert("暂无数据可导出");
+            let csv = '\uFEFFID,微信号,CN称呼,角色风格,活动名称,预约日期,预约时段,定金状态,预约数量,备注,提交时间\n';
+            allBookings.forEach(r => {
+                const remarks = r.remarks ? r.remarks.replace(/,/g, '，').replace(/\n/g, ' ') : '';
+                csv += `${r.id},${r.wechat},${r.cn},${r.character},${r.event_name},${r.date},"${r.time || ''}",${r.deposit},${r.quantity},${remarks},${r.created_at}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "档期数据.csv"; link.click();
+        }
+
+        function openEditModal(m) {
+            document.getElementById('edit_id').value = m.id; 
+            document.getElementById('edit_wechat').value = m.wechat; 
+            document.getElementById('edit_cn').value = m.cn; 
+            document.getElementById('edit_character').value = m.character; 
+            document.getElementById('edit_date').value = m.date; 
+            document.getElementById('edit_time').value = m.time || ''; 
+            document.getElementById('edit_deposit').value = m.deposit; 
+            document.getElementById('edit_qty').value = m.quantity; 
+            document.getElementById('edit_remarks').value = m.remarks || ''; 
+            document.getElementById('editModal').classList.replace('hidden', 'flex');
+        }
+        function submitEdit() {
+            const payload = { id: document.getElementById('edit_id').value, wechat: document.getElementById('edit_wechat').value, cn: document.getElementById('edit_cn').value, character: document.getElementById('edit_character').value, date: document.getElementById('edit_date').value, time: document.getElementById('edit_time').value, deposit: document.getElementById('edit_deposit').value, quantity: document.getElementById('edit_qty').value, remarks: document.getElementById('edit_remarks').value };
+            fetch('/api/bookings/edit', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) }).then(res => { if(res.ok) { document.getElementById('editModal').classList.replace('flex', 'hidden'); loadBookings(); } });
+        }
+        function deleteBooking(id) { if(confirm('🚨 确定删除此条预约吗？（删除后该时段将重新开放）')) { fetch('/api/bookings/delete', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id}) }).then(() => loadBookings()); } }
+
+        fetch('/api/messages').then(res => res.json()).then(msgs => { document.getElementById('msg-tbody').innerHTML = msgs.length ? msgs.map(m => `<tr class="hover:bg-blue-50/50 border-b"><td class="p-2 text-xs"><b class="block">${m.name}</b><span class="text-blue-500">${m.contact}</span></td><td class="p-2 text-xs">${m.content}</td></tr>`).join('') : '<tr><td colspan="2" class="p-4 text-center">暂无留言</td></tr>'; });
+
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); const btn = this.querySelector('button[type="submit"]'); btn.innerText = "压缩中..."; btn.disabled = true;
+            const file = document.getElementById('photoInput').files[0]; if (!file) return;
+            const reader = new FileReader(); reader.readAsDataURL(file);
+            reader.onload = (ev) => { const img = new Image(); img.src = ev.target.result;
+                img.onload = () => { const cvs = document.createElement('canvas'); const ctx = cvs.getContext('2d');
+                    let w = img.width, h = img.height; if(w>1920||h>1920){if(w>h){h*=1920/w;w=1920}else{w*=1920/h;h=1920}}
+                    cvs.width=w; cvs.height=h; ctx.drawImage(img,0,0,w,h);
+                    let q=0.9; const c = () => { cvs.toBlob(b => { if(b.size<=102400||q<=0.2) {
+                        const fd = new FormData(this); fd.set('photo', b, file.name); btn.innerText="上传中...";
+                        fetch('/api/upload',{method:'POST',body:fd}).then(()=>window.location.reload());
+                    } else { q-=0.1; c(); } }, 'image/jpeg', q); }; c();
+                }
+            };
+        });
+        function loadAdminGallery() { fetch('/api/photos').then(res => res.json()).then(photos => { document.getElementById('admin-gallery').innerHTML = photos.length ? photos.map(p => `<div class="relative group rounded border bg-gray-50"><img src="${p.url}" class="w-full h-20 object-cover"><div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center"><button onclick="if(confirm('删除?')) fetch('/api/photos/delete', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:${p.id}})}).then(()=>loadAdminGallery())" class="bg-red-500 text-white px-2 py-1 text-xs">删除</button></div></div>`).join('') : '<p>暂无</p>'; }); }
+        loadAdminGallery();
+    </script>
+</body>
+</html>
